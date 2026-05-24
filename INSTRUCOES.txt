@@ -1,0 +1,109 @@
+============================================================
+ INSTRUCOES DE COMPILACAO E EXECUCAO
+ Trabalho Pratico 1 - DCC059 (Teoria dos Grafos)
+ Tema: Componentes Conexas
+ Estrutura: Matriz de Adjacencia
+============================================================
+
+REQUISITOS
+----------
+- Compilador C++ com suporte a C++17 (g++ >= 7.0 ou clang++ >= 5.0)
+- (Opcional) GNU make para usar o Makefile
+
+ESTRUTURA DE ARQUIVOS
+---------------------
+Grafo.h, Grafo.cpp                      -> Classe MeuGrafo (Matriz de Adjacencia)
+ComponentesConexas.h, .cpp              -> Algoritmo de componentes conexas
+main.cpp                                -> Programa interativo (menu)
+testall.cpp                             -> Bateria de testes obrigatoria
+Makefile                                -> Script de compilacao
+exemplos/                               -> Grafos de exemplo
+
+============================================================
+OPCAO 1 - USANDO MAKE (recomendado)
+============================================================
+
+  make                # compila os dois executaveis
+  ./test_grafo        # executa a bateria de testes obrigatorios
+  ./programa          # executa o menu interativo
+
+Alvos disponiveis:
+  make                # gera 'programa' e 'test_grafo'
+  make programa       # gera apenas o programa interativo
+  make test_grafo     # gera apenas o executavel de testes
+  make run            # compila e executa o programa interativo
+  make test           # compila e executa a bateria de testes
+  make clean          # remove arquivos compilados
+
+============================================================
+OPCAO 2 - COMPILACAO MANUAL (sem make)
+============================================================
+
+Para a bateria de testes obrigatoria:
+  g++ -std=c++17 -Wall -Wextra -O2 -o test_grafo testall.cpp Grafo.cpp
+  ./test_grafo
+
+Para o programa interativo:
+  g++ -std=c++17 -Wall -Wextra -O2 -o programa main.cpp Grafo.cpp ComponentesConexas.cpp
+  ./programa
+
+============================================================
+USO DO PROGRAMA INTERATIVO
+============================================================
+
+Ao iniciar o programa, ele perguntara:
+  - O grafo eh orientado? (s/n)
+  - O grafo eh ponderado? (s/n)
+
+Em seguida apresentara um menu com as opcoes:
+   1) Inserir vertice
+   2) Remover vertice
+   3) Inserir aresta
+   4) Remover aresta
+   5) Alterar peso de aresta
+   6) Exibir grafo (formato CS Academy)
+   7) Verificar existencia de aresta
+   8) Calcular grau de um vertice
+   9) Listar vizinhos de um vertice
+  10) Verificar adjacencia
+  11) Encontrar componentes conexas         <-- algoritmo principal
+  12) Componentes fortemente conexas        <-- Kosaraju (grafos orientados)
+  13) Carregar grafo de arquivo             <-- formato CS Academy
+  14) Salvar grafo em arquivo
+  15) Criar novo grafo (reset)
+   0) Sair
+
+============================================================
+FORMATO DOS ARQUIVOS DE GRAFO (CS Academy)
+============================================================
+Compativel com https://csacademy.com/app/graph_editor/
+
+Cada linha pode ser:
+  - Um numero inteiro             -> vertice isolado
+  - Dois numeros inteiros         -> aresta nao-ponderada (u v)
+  - Dois inteiros e um decimal    -> aresta ponderada (u v peso)
+  - Linha vazia                   -> ignorada
+  - Linha iniciando com '#'       -> comentario (ignorada)
+
+Exemplo de arquivo:
+  # Componente A
+  0 1 1.5
+  1 2 2.0
+  # Vertice isolado
+  5
+
+============================================================
+EXEMPLOS PRONTOS PARA TESTAR
+============================================================
+exemplos/exemplo1_naoorientado.txt   - 8 vertices, 3 componentes conexas
+exemplos/exemplo2_orientado.txt      - Tres ciclos -> 3 SCCs com Kosaraju
+exemplos/exemplo3_simples.txt        - Nao-ponderado, 3 componentes
+
+Para testar:
+  1) Execute ./programa
+  2) Responda 'n' para nao-orientado, 's' para ponderado
+  3) Opcao 13 -> caminho: exemplos/exemplo1_naoorientado.txt
+  4) Opcao 6 para exibir o grafo carregado
+  5) Opcao 11 para encontrar as componentes conexas
+
+============================================================

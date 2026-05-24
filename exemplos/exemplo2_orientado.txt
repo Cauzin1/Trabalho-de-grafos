@@ -1,0 +1,29 @@
+# Grafo de exemplo 2 - Orientado, ponderado
+#
+# Estrutura proposital para o algoritmo de Kosaraju:
+#
+#   Componentes fortemente conexos esperados:
+#     SCC 1: {0, 1, 2}     (ciclo 0->1->2->0)
+#     SCC 2: {3, 4, 5}     (ciclo 3->4->5->3)
+#     SCC 3: {6}           (folha)
+#
+#   Componente fracamente conexo (ignorando direcao):
+#     Componente unico: {0, 1, 2, 3, 4, 5, 6}
+#       (ha o arco-ponte 2->3 e o arco 5->6 que conectam tudo
+#       se ignorarmos a direcao)
+
+# Ciclo 1
+0 1 1.0
+1 2 1.0
+2 0 1.0
+
+# Ponte que liga os dois ciclos (mas nao volta -> SCCs separados)
+2 3 5.0
+
+# Ciclo 2
+3 4 1.0
+4 5 1.0
+5 3 1.0
+
+# Aresta para vertice 6 (sem volta)
+5 6 2.0

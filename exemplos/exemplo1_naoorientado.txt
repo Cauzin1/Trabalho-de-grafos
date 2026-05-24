@@ -1,0 +1,24 @@
+# Grafo de exemplo 1 - Nao-orientado, ponderado
+# Tres componentes conexas:
+#   Componente 1: {0, 1, 2, 3}
+#   Componente 2: {4, 5, 6}
+#   Componente 3: {7}        (vertice isolado)
+#
+# Formato CS Academy (https://csacademy.com/app/graph_editor/):
+#   - 1 numero      = vertice isolado
+#   - 2 numeros     = aresta nao-ponderada u v
+#   - 3 valores     = aresta ponderada u v peso
+# Linhas em branco e linhas comecando com '#' sao ignoradas.
+
+# --- Componente 1 ---
+0 1 1.5
+1 2 2.0
+2 3 0.5
+0 3 4.0
+
+# --- Componente 2 ---
+4 5 3.0
+5 6 1.0
+
+# --- Componente 3 (vertice isolado) ---
+7
