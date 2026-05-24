@@ -3,7 +3,7 @@
 **Tema:** Componentes Conexas
 **Estrutura escolhida:** Matriz de Adjacência
 **Linguagem:** C++ (padrão C++17)
-**Alunos:** [Thomás Sousa Causin Alves]
+**Alunos:** Thomás Causin, Caio Cunha, Nicholas Cardoso, Igor Reis
 
 ---
 
