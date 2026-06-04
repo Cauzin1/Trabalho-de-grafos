@@ -169,3 +169,34 @@ A bateria fornecida em `testall.cpp` (23 testes) é executada integralmente:
   TOTAL DE CASOS TESTADOS: 23
 ==================================================
 ```
+---
+
+## 9. Exemplo de Utilização
+
+Abaixo está um exemplo simples de criação de um grafo não orientado e não ponderado:
+
+```cpp
+MeuGrafo g(false, false);
+
+g.inserirVertice(1);
+g.inserirVertice(2);
+g.inserirVertice(3);
+
+g.inserirAresta(1, 2);
+g.inserirAresta(2, 3);
+
+g.exibirGrafo();
+```
+
+Esse exemplo cria três vértices e duas arestas, formando um único componente conexo.
+
+---
+
+## 10. Autores
+
+Projeto desenvolvido para a disciplina DCC059 – Teoria dos Grafos.
+
+- Thomás Causin
+- Caio Cunha
+- Nicholas Cardoso
+- Igor Reis
