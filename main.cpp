@@ -1,20 +1,3 @@
-/**
- * ============================================================================
- *  main.cpp
- *  Programa interativo para uso da biblioteca de grafos.
- *
- *  DCC059 - Teoria dos Grafos - Trabalho Prático 1
- *  Tema: Componentes Conexas
- *
- *  Permite:
- *    - Criar grafo (orientado ou não, ponderado ou não)
- *    - Carregar / salvar grafos em arquivo (formato CS Academy)
- *    - Manipular vértices e arestas
- *    - Consultar informações do grafo (grau, vizinhos, adjacência)
- *    - Executar o algoritmo de Componentes Conexas
- *    - Executar o algoritmo de Componentes Fortemente Conexas (Kosaraju)
- * ============================================================================
- */
 #include "ComponentesConexas.h"
 #include "Grafo.h"
 
@@ -23,13 +6,11 @@
 #include <memory>
 #include <string>
 
-// Limpa o buffer de entrada após leitura numérica
 static void limparBuffer() {
     std::cin.clear();
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
-// Lê um inteiro do usuário com validação simples
 static int lerInt(const std::string& prompt) {
     int valor;
     while (true) {
@@ -44,7 +25,6 @@ static int lerInt(const std::string& prompt) {
     }
 }
 
-// Lê um double do usuário com validação simples
 static double lerDouble(const std::string& prompt) {
     double valor;
     while (true) {
@@ -59,7 +39,6 @@ static double lerDouble(const std::string& prompt) {
     }
 }
 
-// Lê uma linha de string
 static std::string lerString(const std::string& prompt) {
     std::string s;
     std::cout << prompt;
@@ -67,14 +46,12 @@ static std::string lerString(const std::string& prompt) {
     return s;
 }
 
-// Lê uma resposta s/n (case-insensitive)
 static bool lerSimNao(const std::string& prompt) {
     std::string r = lerString(prompt);
     if (r.empty()) return false;
     return (r[0] == 's' || r[0] == 'S' || r[0] == 'y' || r[0] == 'Y');
 }
 
-// Exibe o cabeçalho com as configurações atuais do grafo
 static void exibirCabecalho(const MeuGrafo& g) {
     std::cout << "\n+============================================================+\n";
     std::cout << "  Grafo atual: "
@@ -87,7 +64,6 @@ static void exibirCabecalho(const MeuGrafo& g) {
     std::cout << "+============================================================+\n";
 }
 
-// Exibe o menu principal
 static void exibirMenu() {
     std::cout << "\n+--------------- MENU ---------------+\n";
     std::cout << "| -- Manipulacao do Grafo --        |\n";
@@ -114,7 +90,6 @@ static void exibirMenu() {
     std::cout << "+------------------------------------+\n";
 }
 
-// Cria um novo grafo perguntando ao usuário as configurações
 static std::unique_ptr<MeuGrafo> criarNovoGrafo() {
     std::cout << "\n--- Criacao de Novo Grafo ---\n";
     bool dir = lerSimNao("O grafo eh orientado? (s/n): ");
@@ -125,9 +100,6 @@ static std::unique_ptr<MeuGrafo> criarNovoGrafo() {
     return std::make_unique<MeuGrafo>(dir, pond);
 }
 
-// ============================================================================
-// MAIN
-// ============================================================================
 int main() {
     std::cout << "============================================================\n";
     std::cout << "   TRABALHO PRATICO 1 - DCC059 (Teoria dos Grafos)\n";
@@ -144,13 +116,13 @@ int main() {
         opcao = lerInt("Escolha uma opcao: ");
 
         switch (opcao) {
-            case 1: { // Inserir vertice
+            case 1: {
                 int v = lerInt("  Id do vertice a inserir: ");
                 grafo->inserirVertice(v);
                 std::cout << "  Vertice " << v << " inserido.\n";
                 break;
             }
-            case 2: { // Remover vertice
+            case 2: {
                 int v = lerInt("  Id do vertice a remover: ");
                 if (!grafo->existeVertice(v)) {
                     std::cout << "  Vertice " << v << " nao existe.\n";
@@ -160,7 +132,7 @@ int main() {
                 }
                 break;
             }
-            case 3: { // Inserir aresta
+            case 3: {
                 int u = lerInt("  Vertice origem (u): ");
                 int v = lerInt("  Vertice destino (v): ");
                 double p = 1.0;
@@ -173,14 +145,14 @@ int main() {
                           << ".\n";
                 break;
             }
-            case 4: { // Remover aresta
+            case 4: {
                 int u = lerInt("  Vertice origem (u): ");
                 int v = lerInt("  Vertice destino (v): ");
                 grafo->removerAresta(u, v);
                 std::cout << "  Aresta (" << u << ", " << v << ") removida (se existia).\n";
                 break;
             }
-            case 5: { // Alterar peso
+            case 5: {
                 if (!grafo->ehPonderado()) {
                     std::cout << "  Grafo nao-ponderado: operacao nao aplicavel.\n";
                     break;
@@ -196,13 +168,13 @@ int main() {
                 std::cout << "  Peso atualizado.\n";
                 break;
             }
-            case 6: { // Exibir grafo
+            case 6: {
                 std::cout << "\n--- Grafo (formato CS Academy) ---\n";
                 grafo->exibirGrafo();
                 std::cout << "----------------------------------\n";
                 break;
             }
-            case 7: { // Verificar aresta
+            case 7: {
                 int u = lerInt("  Vertice origem (u): ");
                 int v = lerInt("  Vertice destino (v): ");
                 bool existe = grafo->verificarAresta(u, v);
@@ -213,13 +185,13 @@ int main() {
                 }
                 break;
             }
-            case 8: { // Grau
+            case 8: {
                 int v = lerInt("  Id do vertice: ");
                 std::cout << "  Grau do vertice " << v << ": "
                           << grafo->grauVertice(v) << "\n";
                 break;
             }
-            case 9: { // Listar vizinhos
+            case 9: {
                 int v = lerInt("  Id do vertice: ");
                 std::vector<int> vz = grafo->listarVizinhos(v);
                 std::cout << "  Vizinhos de " << v << ": [";
@@ -229,14 +201,14 @@ int main() {
                 std::cout << "]\n";
                 break;
             }
-            case 10: { // Adjacencia
+            case 10: {
                 int u = lerInt("  Vertice u: ");
                 int v = lerInt("  Vertice v: ");
                 std::cout << "  saoAdjacentes(" << u << ", " << v << ")? "
                           << (grafo->saoAdjacentes(u, v) ? "SIM" : "NAO") << "\n";
                 break;
             }
-            case 11: { // Componentes conexas
+            case 11: {
                 auto comp = ComponentesConexas::encontrar(*grafo);
                 std::string titulo = grafo->ehDirecionado()
                     ? "Componentes Fracamente Conexos"
@@ -244,7 +216,7 @@ int main() {
                 ComponentesConexas::imprimir(comp, titulo);
                 break;
             }
-            case 12: { // Componentes fortemente conexas
+            case 12: {
                 if (!grafo->ehDirecionado()) {
                     std::cout << "  Para grafos nao-orientados, componentes fortemente\n"
                               << "  conexos coincidem com componentes conexos.\n";
@@ -253,21 +225,21 @@ int main() {
                 ComponentesConexas::imprimir(comp, "Componentes Fortemente Conexos (Kosaraju)");
                 break;
             }
-            case 13: { // Carregar de arquivo
+            case 13: {
                 std::string caminho = lerString("  Caminho do arquivo: ");
                 if (grafo->carregarDeArquivo(caminho)) {
                     std::cout << "  Grafo carregado com sucesso.\n";
                 }
                 break;
             }
-            case 14: { // Salvar em arquivo
+            case 14: {
                 std::string caminho = lerString("  Caminho do arquivo: ");
                 if (grafo->salvarEmArquivo(caminho)) {
                     std::cout << "  Grafo salvo em '" << caminho << "'.\n";
                 }
                 break;
             }
-            case 15: { // Reset
+            case 15: {
                 grafo = criarNovoGrafo();
                 break;
             }

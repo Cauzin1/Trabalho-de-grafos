@@ -57,6 +57,20 @@ make            # gera ambos: 'programa' (interativo) e 'test_grafo' (testes)
 ./programa      # abre o menu interativo
 ```
 
+### Caso o terminal não reconheça `make` (ex: PowerShell no Windows)
+
+Abra o **Git Bash** na pasta do projeto (botão direito → "Git Bash Here") e compile manualmente:
+
+```bash
+# programa interativo
+g++ -std=c++17 -o grafos main.cpp Grafo.cpp ComponentesConexas.cpp
+./grafos
+
+# bateria de testes
+g++ -std=c++17 -o test_grafo testall.cpp Grafo.cpp
+./test_grafo
+```
+
 ---
 
 ## 4. Operações Obrigatórias Implementadas
@@ -194,7 +208,7 @@ Esse exemplo cria três vértices e duas arestas, formando um único componente 
 
 ## 10. Autores
 
-Projeto desenvolvido para a disciplina DCC059 – Teoria dos Grafos.
+Projeto desenvolvido para a disciplina DCC059 - Teoria dos Grafos.
 
 - Thomás Causin
 - Caio Cunha

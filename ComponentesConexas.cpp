@@ -1,20 +1,3 @@
-/**
- * ============================================================================
- *  ComponentesConexas.cpp
- *  Implementação do algoritmo de Componentes Conexas.
- *
- *  Abordagem:
- *   - Mantemos um conjunto (std::set) de vértices já visitados.
- *   - Para cada vértice ainda não visitado, executamos BFS e
- *     coletamos todos os vértices alcançáveis -> um componente.
- *   - Em grafos orientados, para componentes FRACAMENTE conexos,
- *     percorremos as arestas em ambos os sentidos (vizinhos de saída
- *     e vizinhos de entrada).
- *
- *  Para componentes FORTEMENTE conexos usamos Kosaraju, que faz duas
- *  passagens de DFS – uma no grafo original e outra no transposto.
- * ============================================================================
- */
 #include "ComponentesConexas.h"
 
 #include <algorithm>
@@ -25,21 +8,14 @@
 #include <unordered_map>
 #include <unordered_set>
 
-// ----------------------------------------------------------------------------
-// Função auxiliar: para um grafo ORIENTADO, retorna o "conjunto de vizinhos
-// não-direcionais" do vértice v – ou seja, todos os vértices conectados a v
-// independentemente da direção da aresta. Usado para componentes fracamente
-// conexos.
-// ----------------------------------------------------------------------------
+// retorna vizinhos de v ignorando direção das arestas (para componentes fracamente conexas)
 static std::vector<int> vizinhosBidirecionais(const MeuGrafo& grafo, int v) {
     std::vector<int> resultado = grafo.listarVizinhos(v);
     if (!grafo.ehDirecionado()) return resultado;
 
-    // Em grafos orientados, também precisamos dos vértices que apontam para v
     for (int u : grafo.obterVertices()) {
         if (u == v) continue;
         if (grafo.verificarAresta(u, v)) {
-            // evita duplicação caso v->u também exista
             if (std::find(resultado.begin(), resultado.end(), u) == resultado.end()) {
                 resultado.push_back(u);
             }
@@ -48,11 +24,6 @@ static std::vector<int> vizinhosBidirecionais(const MeuGrafo& grafo, int v) {
     return resultado;
 }
 
-// ----------------------------------------------------------------------------
-// encontrar()
-//   - Não-orientado: componentes conexos clássicos (BFS).
-//   - Orientado    : componentes fracamente conexos.
-// ----------------------------------------------------------------------------
 std::vector<std::vector<int>> ComponentesConexas::encontrar(const MeuGrafo& grafo) {
     std::vector<std::vector<int>> componentes;
     std::set<int> visitados;
@@ -61,7 +32,7 @@ std::vector<std::vector<int>> ComponentesConexas::encontrar(const MeuGrafo& graf
     for (int v : vertices) {
         if (visitados.count(v)) continue;
 
-        // -------- BFS a partir de v --------
+        // BFS a partir de v
         std::vector<int> componente;
         std::queue<int> fila;
 
@@ -73,9 +44,7 @@ std::vector<std::vector<int>> ComponentesConexas::encontrar(const MeuGrafo& graf
             fila.pop();
             componente.push_back(atual);
 
-            // Vizinhos (tratando arestas como não-direcionais se preciso)
-            std::vector<int> vizinhos = vizinhosBidirecionais(grafo, atual);
-            for (int viz : vizinhos) {
+            for (int viz : vizinhosBidirecionais(grafo, atual)) {
                 if (!visitados.count(viz)) {
                     visitados.insert(viz);
                     fila.push(viz);
@@ -83,22 +52,16 @@ std::vector<std::vector<int>> ComponentesConexas::encontrar(const MeuGrafo& graf
             }
         }
 
-        // Ordena para apresentação consistente
         std::sort(componente.begin(), componente.end());
         componentes.push_back(componente);
     }
     return componentes;
 }
 
-// ----------------------------------------------------------------------------
-// Helpers para Kosaraju
-// ----------------------------------------------------------------------------
-
-/** DFS iterativa no grafo original, empilhando em ordem de finalização. */
+// DFS iterativa no grafo original; empilha vértices em ordem de finalização
 static void dfsFinalizacao(const MeuGrafo& grafo, int v,
                            std::unordered_set<int>& visitados,
                            std::stack<int>& pilhaFinalizacao) {
-    // DFS iterativa com pilha de estados (vértice, índice do próximo vizinho)
     std::stack<std::pair<int, size_t>> pilha;
     std::unordered_map<int, std::vector<int>> cacheVizinhos;
 
@@ -109,7 +72,6 @@ static void dfsFinalizacao(const MeuGrafo& grafo, int v,
         auto& topo = pilha.top();
         int u = topo.first;
 
-        // Carrega vizinhos do vértice apenas uma vez
         if (cacheVizinhos.find(u) == cacheVizinhos.end()) {
             cacheVizinhos[u] = grafo.listarVizinhos(u);
         }
@@ -122,13 +84,13 @@ static void dfsFinalizacao(const MeuGrafo& grafo, int v,
                 pilha.push({w, 0});
             }
         } else {
-            pilhaFinalizacao.push(u);   // finaliza vértice
+            pilhaFinalizacao.push(u);
             pilha.pop();
         }
     }
 }
 
-/** DFS no grafo transposto (usando arestas de entrada do grafo original). */
+// DFS no grafo transposto (percorre arestas de entrada do grafo original)
 static void dfsTransposto(const MeuGrafo& grafo, int v,
                           std::unordered_set<int>& visitados,
                           std::vector<int>& componente) {
@@ -141,10 +103,9 @@ static void dfsTransposto(const MeuGrafo& grafo, int v,
         pilha.pop();
         componente.push_back(u);
 
-        // No grafo transposto, vizinhos de u são os vértices w com w->u no original
         for (int w : grafo.obterVertices()) {
             if (visitados.count(w)) continue;
-            if (grafo.verificarAresta(w, u)) {
+            if (grafo.verificarAresta(w, u)) {   // w->u no original = u->w no transposto
                 visitados.insert(w);
                 pilha.push(w);
             }
@@ -152,17 +113,15 @@ static void dfsTransposto(const MeuGrafo& grafo, int v,
     }
 }
 
-// ----------------------------------------------------------------------------
-// encontrarFortementeConexos() - Algoritmo de Kosaraju
-// ----------------------------------------------------------------------------
+// Kosaraju:
+//   1. DFS no grafo original, empilhando por ordem de finalização
+//   2. DFS no transposto na ordem inversa de finalização
 std::vector<std::vector<int>> ComponentesConexas::encontrarFortementeConexos(const MeuGrafo& grafo) {
-    // Para grafo não-orientado, a noção de fortemente conexo coincide com a de conexo.
     if (!grafo.ehDirecionado()) return encontrar(grafo);
 
     std::vector<std::vector<int>> componentes;
     std::vector<int> vertices = grafo.obterVertices();
 
-    // ---- Etapa 1: DFS no grafo original, empilhando por ordem de finalização ----
     std::stack<int> pilhaFinalizacao;
     std::unordered_set<int> visitados;
     for (int v : vertices) {
@@ -171,7 +130,6 @@ std::vector<std::vector<int>> ComponentesConexas::encontrarFortementeConexos(con
         }
     }
 
-    // ---- Etapa 2: DFS no grafo transposto, em ordem decrescente de finalização ----
     visitados.clear();
     while (!pilhaFinalizacao.empty()) {
         int v = pilhaFinalizacao.top();
@@ -187,9 +145,6 @@ std::vector<std::vector<int>> ComponentesConexas::encontrarFortementeConexos(con
     return componentes;
 }
 
-// ----------------------------------------------------------------------------
-// imprimir()
-// ----------------------------------------------------------------------------
 void ComponentesConexas::imprimir(const std::vector<std::vector<int>>& componentes,
                                   const std::string& tipo) {
     std::cout << "\n+-----------------------------------------------------+\n";

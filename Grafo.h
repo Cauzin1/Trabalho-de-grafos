@@ -1,27 +1,12 @@
-/**
- * ============================================================================
- *  Grafo.h
- *  DCC059 - Teoria dos Grafos - Trabalho Prático 1
- *  Tema: Componentes Conexas
- * ----------------------------------------------------------------------------
- *  Classe MeuGrafo: representa um grafo usando MATRIZ DE ADJACÊNCIA.
- *
- *  Características suportadas:
- *      - Orientado ou não-orientado (definido no construtor)
- *      - Ponderado ou não-ponderado (padrão: ponderado)
- *
- *  Como os IDs de vértices podem ser arbitrários (ex.: 0, 5, 99) e não
- *  precisam ser contíguos, mantemos um MAPEAMENTO entre o ID do vértice
- *  e o índice da linha/coluna na matriz:
- *
- *      indiceParaId[i]   -> id do vértice na linha/coluna i da matriz
- *      idParaIndice[id]  -> índice (linha/coluna) na matriz
- *
- *  Cada célula da matriz guarda dois campos:
- *      existe -> indica se há aresta entre os vértices i e j
- *      peso   -> valor do peso (válido apenas se 'existe' for true)
- * ============================================================================
- */
+// Grafo.h - DCC059 Trabalho Prático 1
+// Representa um grafo com matriz de adjacência.
+// Suporta grafos orientados/não-orientados e ponderados/não-ponderados.
+//
+// IDs de vértices podem ser arbitrários (não precisam ser contíguos).
+// Por isso usamos um mapeamento bidirecional entre ID e índice da matriz:
+//   indiceParaId[i]  -> id do vértice na posição i
+//   idParaIndice[id] -> índice na matriz
+
 #ifndef GRAFO_H
 #define GRAFO_H
 
@@ -33,120 +18,49 @@
 
 class MeuGrafo {
 private:
-    /**
-     * Célula da matriz de adjacência.
-     *  existe : true se há aresta entre os vértices das linhas/colunas
-     *  peso   : peso da aresta (0.0 se a aresta não existe)
-     */
+    // célula da matriz: guarda se a aresta existe e seu peso
     struct Celula {
         bool   existe;
         double peso;
         Celula() : existe(false), peso(0.0) {}
     };
 
-    bool direcionado;   // true = grafo orientado;   false = grafo não-orientado
-    bool ponderado;     // true = arestas com peso;  false = arestas com peso 1.0
+    bool direcionado;
+    bool ponderado;
 
-    // Mapeamento bidirecional entre IDs de vértices e índices da matriz
-    std::vector<int>           indiceParaId;   // índice -> id do vértice
-    std::map<int, std::size_t> idParaIndice;   // id do vértice -> índice
+    std::vector<int>           indiceParaId;
+    std::map<int, std::size_t> idParaIndice;
 
-    // Matriz de adjacência (n x n, onde n = indiceParaId.size())
-    // Em grafos não-orientados a matriz é simétrica:
-    //   matriz[i][j].existe == matriz[j][i].existe
-    //   matriz[i][j].peso   == matriz[j][i].peso
+    // matriz n x n; em grafos não-orientados é simétrica
     std::vector<std::vector<Celula>> matriz;
 
 public:
-    // ============================================================
-    //                    CONSTRUTOR / DESTRUTOR
-    // ============================================================
-
-    /**
-     * Cria um grafo vazio.
-     * @param ehDirecionado true para grafo orientado, false caso contrário
-     * @param ehPonderado   true para grafo ponderado (padrão), false caso contrário
-     */
     MeuGrafo(bool ehDirecionado, bool ehPonderado = true);
     ~MeuGrafo() = default;
 
-    // ============================================================
-    //                  OPERAÇÕES DE MANIPULAÇÃO
-    // ============================================================
-
-    /** Insere um vértice no grafo. Se já existir, não faz nada. */
     void inserirVertice(int v);
-
-    /** Remove um vértice e TODAS as arestas incidentes a ele. */
-    void removerVertice(int v);
-
-    /**
-     * Insere uma aresta entre u e v com o peso informado.
-     * - Cria os vértices automaticamente caso não existam.
-     * - Se a aresta já existir, atualiza o peso (não duplica).
-     * - Em grafo não-orientado, espelha em matriz[j][i].
-     */
+    void removerVertice(int v);   // remove também todas as arestas incidentes
     void inserirAresta(int u, int v, double peso = 1.0);
-
-    /** Remove a aresta entre u e v (ambas as direções, se não-orientado). */
     void removerAresta(int u, int v);
-
-    /** Verifica se existe aresta entre u e v. Não lança exceção para vértices inválidos. */
     bool verificarAresta(int u, int v) const;
-
-    /** Altera o peso de uma aresta existente. Não faz nada se a aresta não existir. */
     void alterarPesoAresta(int u, int v, double peso);
+    void exibirGrafo() const;   // formato CS Academy
 
-    /** Exibe o grafo em formato compatível com csacademy.com/app/graph_editor/ */
-    void exibirGrafo() const;
-
-    // ============================================================
-    //                INFORMAÇÕES SOBRE VÉRTICES
-    // ============================================================
-
-    /**
-     * Calcula o grau do vértice.
-     *  - Grafo não-orientado: número de arestas incidentes.
-     *  - Grafo orientado    : grau de saída + grau de entrada.
-     * Retorna 0 se o vértice não existir.
-     */
+    // grau de saída + entrada em orientado; total de incidentes em não-orientado
     int grauVertice(int v) const;
-
-    /** Lista os vizinhos (vértices de destino das arestas que saem de v). */
     std::vector<int> listarVizinhos(int v) const;
-
-    /** Verifica se existe a aresta direta u -> v (mesma semântica de verificarAresta). */
     bool saoAdjacentes(int u, int v) const;
-
-    // ============================================================
-    //                    UTILITÁRIOS / GETTERS
-    // ============================================================
 
     bool existeVertice(int v) const;
     int  numVertices() const;
     int  numArestas() const;
-    std::vector<int> obterVertices() const;     // retornado em ordem crescente
+    std::vector<int> obterVertices() const;   // ordem crescente
     bool ehDirecionado() const { return direcionado; }
-    bool ehPonderado()  const { return ponderado;  }
-
-    /** Retorna o peso da aresta (u,v). Retorna 0.0 se a aresta não existir. */
+    bool ehPonderado()   const { return ponderado;  }
     double obterPeso(int u, int v) const;
 
-    // ============================================================
-    //                    ENTRADA E SAÍDA EM ARQUIVO
-    // ============================================================
-
-    /**
-     * Carrega grafo a partir de arquivo no formato CS Academy.
-     * Cada linha pode ser:
-     *    - um único inteiro  -> vértice isolado
-     *    - dois inteiros     -> aresta não ponderada u v
-     *    - dois inteiros + um double -> aresta ponderada u v peso
-     * Linhas em branco e linhas começando com '#' são ignoradas.
-     */
+    // formato CS Academy: inteiro isolado = vértice, "u v [peso]" = aresta
     bool carregarDeArquivo(const std::string& nomeArquivo);
-
-    /** Salva o grafo em arquivo no formato CS Academy. */
     bool salvarEmArquivo(const std::string& nomeArquivo) const;
 };
 

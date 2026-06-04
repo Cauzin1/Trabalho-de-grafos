@@ -1,0 +1,75 @@
+Observacoes sobre o codigo - Trabalho Pratico 1 - Teoria dos Grafos 
+=========================================================
+
+Oi professora, durante a revisao do codigo que fiz hoje,
+encontrei algumas observacoes que achei
+importante registrar. Nao sao erros que quebram o programa, mas sao
+pontos que podem ser relevantes que eu vi.
+
+---
+
+OBSERVACAO 1 - Complexidade real diferente da comentada (ComponentesConexas.cpp)
+----------------------------------------------------------------------------------
+
+Nos comentarios do codigo, tanto a funcao encontrar() quanto a
+encontrarFortementeConexos() dizem ter complexidade O(V + E). Porem,
+ao analisar com mais cuidado, percebi que isso nao e verdade em dois
+trechos:
+
+a) Funcao vizinhosBidirecionais() (linha ~39):
+   Dentro do loop que percorre todos os vertices do grafo, e usado
+   std::find para checar se um vertice ja esta no vetor resultado.
+   Como std::find e O(V), e ele e chamado dentro de um loop de V
+   vertices, essa parte e na verdade O(V^2). Isso faz com que o BFS
+   de componentes conexas seja O(V^2) no pior caso para grafos
+   orientados, e nao O(V + E) como esta escrito.
+
+b) Funcao dfsTransposto() (linha ~145):
+   Para simular o grafo transposto, a funcao percorre todos os
+   vertices do grafo (obterVertices()) para cada vertice u que esta
+   sendo processado, verificando se existe aresta w -> u no original.
+   Isso tambem resulta em O(V) por vertice processado, tornando a
+   segunda passagem do Kosaraju O(V^2) no pior caso.
+
+Resumindo: o Kosaraju esta implementado de forma correta logicamente,
+mas a complexidade real é O(V^2) e nao O(V + E).
+Para grafos pequenos (como os usados nos exemplos)
+isso nao faz diferenca pratica, mas em grafos grandes seria um problema, 
+ai acredito que seria um ponto de melhoria para o proximo trabalho.
+
+---
+
+OBSERVACAO 2 - Contagem errada de self-loops em grafos nao-orientados (Grafo.cpp)
+-----------------------------------------------------------------------------------
+
+Na funcao inserirAresta(), quando u == v (self-loop), o codigo so
+define matriz[i][i] uma vez, pois a condicao de espelhamento e:
+
+    if (!direcionado && i != j)
+
+Ou seja, para um self-loop em grafo nao-orientado,
+a matriz[i][i] recebe exists = true apenas uma vez, e até ai ta correto.
+
+Porem, na funcao numArestas(), o codigo conta todas as celulas com
+existe = true e depois divide por 2 (pois a matriz e simetrica).
+O problema e que o self-loop aparece só uma vez na matriz (nao
+duas no caso), entao ao dividir por 2 ele e contado como 0.5, que no caso
+colocando para inteiro vira 0. Ou seja, self-loops em grafos nao-orientados
+nao sao contados por numArestas().
+
+Esse e um caso de borda bem especifico também, mas resolvi colocar aqui porque
+sei que é um caso que pode acontecer também, não sei como ainda mas preciso melhorar
+isso também
+
+---
+
+Conclusao:
+----------
+
+No geral o codigo esta correto e os algoritmos funcionam como esperado.
+Acedito que esses casos são só casos mais no limite em que eu precisaria de melhorar
+alguma coisa, porém no geral acho que vai rodar tranquilo. Não modifiquei nada no código
+só criei esse arquivo, porque sei que poderia ser injusto com as outras equipes, mas acho
+valido colocar esses cenários porque sei que poderiam ser cenários de dúvidas.
+
+Enfim, muito obrigado pela oportunidade novamente :)
